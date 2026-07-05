@@ -37,55 +37,58 @@ def create_users_table():
 create_users_table()
 
 
+
 # ==========================
 # Student Functions
 # ==========================
 
-def add_student_db(name, roll, branch):
+def add_student_db(name, roll, branch, user_id):
     conn = get_connection()
 
     conn.execute(
-        "INSERT INTO students(name, roll, branch) VALUES (?, ?, ?)",
-        (name, roll, branch)
+         "INSERT INTO students(name, roll, branch, user_id) VALUES (?, ?, ?, ?)",
+        (name, roll, branch, user_id)
     )
 
     conn.commit()
     conn.close()
 
 
-def get_students():
+def get_students(user_id):
     conn = get_connection()
 
     students = conn.execute(
-        "SELECT * FROM students ORDER BY id DESC"
+        "SELECT * FROM students WHERE user_id = ? ORDER BY id DESC",
+        (user_id,)
     ).fetchall()
 
     conn.close()
     return students
 
 
-def search_students(search):
+def search_students(search, user_id):
     conn = get_connection()
 
     students = conn.execute(
         """
         SELECT * FROM students
-        WHERE name LIKE ? OR roll LIKE ?
+        WHERE user_id = ?
+        AND (name LIKE ? OR roll LIKE ?)
         ORDER BY id DESC
         """,
-        ('%' + search + '%', '%' + search + '%')
+        (user_id, '%' + search + '%', '%' + search + '%')
     ).fetchall()
 
     conn.close()
     return students
 
 
-def get_student(id):
+def get_student(id, user_id):
     conn = get_connection()
 
     student = conn.execute(
-        "SELECT * FROM students WHERE id = ?",
-        (id,)
+        "SELECT * FROM students WHERE id = ? AND user_id = ?",
+        (id, user_id)
     ).fetchone()
 
     conn.close()
@@ -104,11 +107,12 @@ def delete_student(id):
     conn.close()
 
 
-def total_students():
+def total_students(user_id):
     conn = get_connection()
 
     total = conn.execute(
-        "SELECT COUNT(*) FROM students"
+        "SELECT COUNT(*) FROM students WHERE user_id = ?",
+        (user_id,)
     ).fetchone()[0]
 
     conn.close()
@@ -136,17 +140,15 @@ def signup():
 
         hashed_password = generate_password_hash(password)
 
-        try:
-            conn = get_connection()
+        conn = get_connection()
 
+        try:
             conn.execute(
                 "INSERT INTO users(username, email, password) VALUES (?, ?, ?)",
                 (username, email, hashed_password)
             )
 
             conn.commit()
-            conn.close()
-
             return redirect("/login")
 
         except sqlite3.IntegrityError:
@@ -154,6 +156,9 @@ def signup():
                 "signup.html",
                 error="Username or Email already exists"
             )
+
+        finally:
+            conn.close()
 
     return render_template("signup.html")
 
@@ -180,6 +185,8 @@ def login():
 
         if user and check_password_hash(user["password"], password):
             session["user"] = user["username"]
+            session["user_id"] = user["id"]
+
             return redirect("/")
 
         return render_template(
@@ -205,18 +212,18 @@ def home():
         roll = request.form["roll"]
         branch = request.form["branch"]
 
-        add_student_db(name, roll, branch)
+        add_student_db(name, roll, branch, session["user_id"])
 
         return redirect("/")
 
     search = request.args.get("search")
 
     if search:
-        students = search_students(search)
+        students = search_students(search, session["user_id"])
     else:
-        students = get_students()
+        students = get_students(session["user_id"])
 
-    total = total_students()
+    total = total_students(session["user_id"])
 
     return render_template(
         "index.html",
@@ -231,7 +238,15 @@ def delete(id):
     if "user" not in session:
         return redirect("/login")
 
-    delete_student(id)
+    conn = get_connection()
+
+    conn.execute(
+        "DELETE FROM students WHERE id = ? AND user_id = ?",
+        (id, session["user_id"])
+    )
+
+    conn.commit()
+    conn.close()
 
     return redirect("/")
 
@@ -242,7 +257,7 @@ def edit(id):
     if "user" not in session:
         return redirect("/login")
 
-    student = get_student(id)
+    student = get_student(id, session["user_id"])
 
     return render_template("edit.html", student=student)
 
@@ -263,9 +278,9 @@ def update(id):
         """
         UPDATE students
         SET name = ?, roll = ?, branch = ?
-        WHERE id = ?
+        WHERE id = ? AND user_id = ?
         """,
-        (name, roll, branch, id)
+        (name, roll, branch, id, session["user_id"])
     )
 
     conn.commit()
