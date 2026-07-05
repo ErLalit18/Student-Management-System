@@ -137,7 +137,7 @@ def login():
         username = request.form["username"]
         password = request.form["password"]
 
-        if username == "admin" and password == "admin123":
+        if username == "Lalitk" and password == "Lalit@123":
 
             session["user"] = username
 
