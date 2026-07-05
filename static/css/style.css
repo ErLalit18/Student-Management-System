@@ -1,0 +1,141 @@
+body{
+
+    background:#f4f6f9;
+
+    font-family:Arial, Helvetica, sans-serif;
+
+}
+
+.main-container{
+
+    background:white;
+
+    padding:30px;
+
+    border-radius:15px;
+
+    box-shadow:0 5px 20px rgba(0,0,0,.1);
+
+}
+
+.navbar{
+
+    padding:12px 0;
+
+}
+
+.navbar-brand{
+
+    font-size:24px;
+
+    font-weight:bold;
+
+}
+
+.card{
+
+    border:none;
+
+    border-radius:15px;
+
+}
+
+.card-header{
+
+    border-radius:15px 15px 0 0 !important;
+
+}
+
+.table{
+
+    margin-bottom:0;
+
+}
+
+.btn{
+
+    border-radius:8px;
+
+}
+
+.form-control{
+
+    border-radius:8px;
+
+}
+
+footer{
+
+    text-align:center;
+
+    margin-top:40px;
+
+    padding:20px;
+
+    color:gray;
+
+    font-size:15px;
+
+}
+
+@media(max-width:992px){
+
+    .navbar-brand{
+
+        font-size:20px;
+
+    }
+
+}
+
+@media(max-width:768px){
+
+    .main-container{
+
+        padding:20px;
+
+    }
+
+    h1{
+
+        font-size:28px;
+
+    }
+
+    .navbar-brand{
+
+        font-size:18px;
+
+    }
+
+}
+
+@media(max-width:576px){
+
+    h1{
+
+        font-size:24px;
+
+    }
+
+    .card{
+
+        margin-bottom:20px;
+
+    }
+
+    .btn{
+
+        width:100%;
+
+        margin-top:5px;
+
+    }
+
+    td,th{
+
+        font-size:14px;
+
+    }
+
+}
