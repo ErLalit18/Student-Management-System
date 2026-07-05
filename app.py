@@ -2,14 +2,11 @@ import sqlite3
 import database
 
 from flask import Flask, render_template, request, redirect, session
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 app.secret_key = "student_management_secret"
 
-
-# ==========================
-# Database Connection
-# ==========================
 
 def get_connection():
     conn = sqlite3.connect("students.db")
@@ -18,11 +15,33 @@ def get_connection():
 
 
 # ==========================
-# Add Student
+# Create Users Table
+# ==========================
+
+def create_users_table():
+    conn = get_connection()
+
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS users(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE NOT NULL,
+            email TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL
+        )
+    """)
+
+    conn.commit()
+    conn.close()
+
+
+create_users_table()
+
+
+# ==========================
+# Student Functions
 # ==========================
 
 def add_student_db(name, roll, branch):
-
     conn = get_connection()
 
     conn.execute(
@@ -34,12 +53,7 @@ def add_student_db(name, roll, branch):
     conn.close()
 
 
-# ==========================
-# Get All Students
-# ==========================
-
 def get_students():
-
     conn = get_connection()
 
     students = conn.execute(
@@ -47,16 +61,10 @@ def get_students():
     ).fetchall()
 
     conn.close()
-
     return students
 
 
-# ==========================
-# Search Students
-# ==========================
-
 def search_students(search):
-
     conn = get_connection()
 
     students = conn.execute(
@@ -69,16 +77,10 @@ def search_students(search):
     ).fetchall()
 
     conn.close()
-
     return students
 
 
-# ==========================
-# Get One Student
-# ==========================
-
 def get_student(id):
-
     conn = get_connection()
 
     student = conn.execute(
@@ -87,16 +89,10 @@ def get_student(id):
     ).fetchone()
 
     conn.close()
-
     return student
 
 
-# ==========================
-# Delete Student
-# ==========================
-
 def delete_student(id):
-
     conn = get_connection()
 
     conn.execute(
@@ -108,12 +104,7 @@ def delete_student(id):
     conn.close()
 
 
-# ==========================
-# Total Students
-# ==========================
-
 def total_students():
-
     conn = get_connection()
 
     total = conn.execute(
@@ -121,8 +112,50 @@ def total_students():
     ).fetchone()[0]
 
     conn.close()
-
     return total
+
+
+# ==========================
+# Signup
+# ==========================
+
+@app.route("/signup", methods=["GET", "POST"])
+def signup():
+
+    if request.method == "POST":
+        username = request.form["username"]
+        email = request.form["email"]
+        password = request.form["password"]
+        confirm_password = request.form["confirm_password"]
+
+        if password != confirm_password:
+            return render_template(
+                "signup.html",
+                error="Passwords do not match"
+            )
+
+        hashed_password = generate_password_hash(password)
+
+        try:
+            conn = get_connection()
+
+            conn.execute(
+                "INSERT INTO users(username, email, password) VALUES (?, ?, ?)",
+                (username, email, hashed_password)
+            )
+
+            conn.commit()
+            conn.close()
+
+            return redirect("/login")
+
+        except sqlite3.IntegrityError:
+            return render_template(
+                "signup.html",
+                error="Username or Email already exists"
+            )
+
+    return render_template("signup.html")
 
 
 # ==========================
@@ -133,14 +166,20 @@ def total_students():
 def login():
 
     if request.method == "POST":
-
         username = request.form["username"]
         password = request.form["password"]
 
-        if username == "Lalitk" and password == "Lalit@123":
+        conn = get_connection()
 
-            session["user"] = username
+        user = conn.execute(
+            "SELECT * FROM users WHERE username = ?",
+            (username,)
+        ).fetchone()
 
+        conn.close()
+
+        if user and check_password_hash(user["password"], password):
+            session["user"] = user["username"]
             return redirect("/")
 
         return render_template(
@@ -162,7 +201,6 @@ def home():
         return redirect("/login")
 
     if request.method == "POST":
-
         name = request.form["name"]
         roll = request.form["roll"]
         branch = request.form["branch"]
@@ -187,10 +225,6 @@ def home():
     )
 
 
-# ==========================
-# Delete
-# ==========================
-
 @app.route("/delete/<int:id>")
 def delete(id):
 
@@ -202,10 +236,6 @@ def delete(id):
     return redirect("/")
 
 
-# ==========================
-# Edit
-# ==========================
-
 @app.route("/edit/<int:id>")
 def edit(id):
 
@@ -214,15 +244,8 @@ def edit(id):
 
     student = get_student(id)
 
-    return render_template(
-        "edit.html",
-        student=student
-    )
+    return render_template("edit.html", student=student)
 
-
-# ==========================
-# Update
-# ==========================
 
 @app.route("/update/<int:id>", methods=["POST"])
 def update(id):
@@ -251,21 +274,11 @@ def update(id):
     return redirect("/")
 
 
-# ==========================
-# Logout
-# ==========================
-
 @app.route("/logout")
 def logout():
-
     session.clear()
-
     return redirect("/login")
 
-
-# ==========================
-# Run Application
-# ==========================
 
 if __name__ == "__main__":
     app.run(debug=True)
