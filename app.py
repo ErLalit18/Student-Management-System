@@ -429,6 +429,128 @@ def update(id):
     return redirect("/")
 
 
+
+# ==========================
+# Profile
+# ==========================
+
+@app.route("/profile", methods=["GET", "POST"])
+def profile():
+
+    if "user_id" not in session:
+        return redirect("/login")
+
+    user_id = session["user_id"]
+
+    conn = get_connection()
+    cur = conn.cursor()
+
+    if request.method == "POST":
+        username = request.form["username"].strip()
+        email = request.form["email"].strip()
+
+        try:
+            cur.execute(
+                """
+                UPDATE users
+                SET username = %s, email = %s
+                WHERE id = %s
+                """,
+                (username, email, user_id)
+            )
+
+            conn.commit()
+
+            session["user"] = username
+
+            cur.close()
+            conn.close()
+
+            return redirect("/profile")
+
+        except psycopg2.errors.UniqueViolation:
+            conn.rollback()
+
+            cur.execute(
+                "SELECT id, username, email FROM users WHERE id = %s",
+                (user_id,)
+            )
+            user = cur.fetchone()
+
+            cur.close()
+            conn.close()
+
+            return render_template(
+                "profile.html",
+                user=user,
+                error="Username or email already exists"
+            )
+
+    cur.execute(
+        "SELECT id, username, email FROM users WHERE id = %s",
+        (user_id,)
+    )
+
+    user = cur.fetchone()
+
+    cur.close()
+    conn.close()
+
+    return render_template("profile.html", user=user)
+
+
+
+# ==========================
+# Change Password
+# ==========================
+
+@app.route("/change-password", methods=["POST"])
+def change_password():
+
+    if "user_id" not in session:
+        return redirect("/login")
+
+    current_password = request.form["current_password"]
+    new_password = request.form["new_password"]
+    confirm_password = request.form["confirm_password"]
+
+    if new_password != confirm_password:
+        return redirect("/profile?password_error=Passwords do not match")
+
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute(
+        "SELECT password FROM users WHERE id = %s",
+        (session["user_id"],)
+    )
+
+    user = cur.fetchone()
+
+    if not user or not check_password_hash(
+        user["password"],
+        current_password
+    ):
+        cur.close()
+        conn.close()
+
+        return redirect("/profile?password_error=Current password is incorrect")
+
+    hashed_password = generate_password_hash(new_password)
+
+    cur.execute(
+        "UPDATE users SET password = %s WHERE id = %s",
+        (hashed_password, session["user_id"])
+    )
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    return redirect("/profile?password_success=Password changed successfully")
+
+
+
 # ==========================
 # Logout
 # ==========================
