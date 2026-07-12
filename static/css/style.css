@@ -1,156 +1,109 @@
-body{
+/* ==========================
+   Base
+========================== */
 
-    background:#f4f6f9;
-
-    font-family:Arial, Helvetica, sans-serif;
-
+* {
+    box-sizing: border-box;
 }
 
-.main-container{
-
-    background:white;
-
-    padding:30px;
-
-    border-radius:15px;
-
-    box-shadow:0 5px 20px rgba(0,0,0,.1);
-
+html,
+body {
+    width: 100%;
+    min-height: 100%;
+    margin: 0;
+    overflow-x: hidden;
 }
 
-.navbar{
-
-    padding:12px 0;
-
+body {
+    background: #f4f6f9;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #212529;
 }
 
-.navbar-brand{
 
-    font-size:24px;
+/* ==========================
+   Navbar
+========================== */
 
-    font-weight:bold;
-
+.navbar {
+    padding: 10px 0;
 }
 
-.card{
-
-    border:none;
-
-    border-radius:15px;
-
+.navbar-brand {
+    max-width: 75%;
+    font-size: 21px;
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: normal;
 }
 
-.card-header{
-
-    border-radius:15px 15px 0 0 !important;
-
+.navbar-actions .btn {
+    min-width: 105px;
 }
 
-.table{
 
-    margin-bottom:0;
+/* ==========================
+   Main Container
+========================== */
 
+.main-container {
+    width: calc(100% - 24px);
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 24px;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
 }
 
-.btn{
-
-    border-radius:8px;
-
+.page-title {
+    font-size: 2rem;
+    font-weight: 700;
 }
 
-.form-control{
 
-    border-radius:8px;
+/* ==========================
+   Common Cards
+========================== */
 
+.card {
+    border: none;
+    border-radius: 15px;
+    overflow: hidden;
 }
 
-footer{
-
-    text-align:center;
-
-    margin-top:40px;
-
-    padding:20px;
-
-    color:gray;
-
-    font-size:15px;
-
+.card-header {
+    padding: 15px 18px;
+    border-bottom: none;
 }
 
-@media(max-width:992px){
-
-    .navbar-brand{
-
-        font-size:20px;
-
-    }
-
+.section-card,
+.analytics-card {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
 }
 
-@media(max-width:768px){
 
-    .main-container{
-
-        padding:20px;
-
-    }
-
-    h1{
-
-        font-size:28px;
-
-    }
-
-    .navbar-brand{
-
-        font-size:18px;
-
-    }
-
-}
-
-@media(max-width:576px){
-
-    h1{
-
-        font-size:24px;
-
-    }
-
-    .card{
-
-        margin-bottom:20px;
-
-    }
-
-    .btn{
-
-        width:100%;
-
-        margin-top:5px;
-
-    }
-
-    td,th{
-
-        font-size:14px;
-
-    }
-
-}
+/* ==========================
+   Dashboard Cards
+========================== */
 
 .dashboard-card {
-    border: 0;
+    min-height: 112px;
+    color: #ffffff;
+    border: none;
     border-radius: 16px;
-    color: white;
-    overflow: hidden;
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.10);
-    transition: transform 0.2s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .dashboard-card:hover {
-    transform: translateY(-4px);
+    transform: translateY(-3px);
+    box-shadow: 0 9px 22px rgba(0, 0, 0, 0.14);
+}
+
+.dashboard-card .card-body {
+    padding: 18px;
 }
 
 .total-card {
@@ -170,45 +123,329 @@ footer{
 }
 
 .dashboard-icon {
-    width: 55px;
-    height: 55px;
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 54px;
+    height: 54px;
     margin-right: 15px;
     border-radius: 14px;
     background: rgba(255, 255, 255, 0.18);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 25px;
+    font-size: 24px;
 }
 
 .dashboard-label {
     margin: 0;
-    opacity: 0.9;
     font-size: 14px;
+    opacity: 0.9;
 }
 
 .dashboard-number {
-    margin: 2px 0 0;
+    margin: 3px 0 0;
+    font-size: 30px;
     font-weight: 700;
+}
+
+
+/* ==========================
+   Analytics Charts
+========================== */
+
+.analytics-card {
+    width: 100%;
+    height: auto;
+}
+
+.analytics-card .card-body {
+    padding: 15px;
+    overflow: hidden;
 }
 
 .chart-container {
     position: relative;
-    min-height: 320px;
+    width: 100%;
+    height: 300px;
+    min-height: 300px;
+    max-height: 300px;
+    overflow: hidden;
 }
 
-@media (max-width: 576px) {
+.chart-container canvas {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+}
+
+
+/* ==========================
+   Forms
+========================== */
+
+.form-label {
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+.form-control,
+.form-select {
+    width: 100%;
+    max-width: 100%;
+    min-height: 44px;
+    border-radius: 8px;
+}
+
+.input-group {
+    width: 100%;
+    max-width: 100%;
+}
+
+.btn {
+    max-width: 100%;
+    border-radius: 8px;
+}
+
+
+/* ==========================
+   Student Table
+========================== */
+
+.table {
+    margin-bottom: 0;
+}
+
+.table th,
+.table td {
+    vertical-align: middle;
+}
+
+.table th {
+    white-space: nowrap;
+}
+
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
+
+
+/* ==========================
+   Profile Page
+========================== */
+
+.profile-container {
+    width: calc(100% - 24px);
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 30px 0;
+}
+
+.profile-card {
+    border: none;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.profile-card .card-body {
+    padding: 24px;
+}
+
+.mobile-full-width {
+    width: 100%;
+}
+
+
+/* ==========================
+   Footer
+========================== */
+
+footer {
+    margin-top: 35px;
+    padding: 20px 12px;
+    color: #6c757d;
+    font-size: 14px;
+    text-align: center;
+}
+
+
+/* ==========================
+   Tablet
+========================== */
+
+@media (max-width: 991px) {
+
+    .navbar-brand {
+        font-size: 18px;
+    }
+
+    .navbar-actions {
+        width: 100%;
+    }
+
+    .navbar-actions .btn {
+        width: 100%;
+    }
+
+    .main-container {
+        padding: 20px;
+    }
+
     .chart-container {
-        min-height: 260px;
+        height: 270px;
+        min-height: 270px;
+        max-height: 270px;
+    }
+}
+
+
+/* ==========================
+   Mobile
+========================== */
+
+@media (max-width: 767px) {
+
+    .navbar {
+        padding: 8px 0;
+    }
+
+    .navbar-brand {
+        max-width: 76%;
+        font-size: 15px;
+    }
+
+    .main-container {
+        width: calc(100% - 16px);
+        padding: 13px;
+        border-radius: 12px;
+    }
+
+    .page-title {
+        margin-bottom: 18px !important;
+        font-size: 1.5rem;
+    }
+
+    h2 {
+        font-size: 1.35rem;
+    }
+
+    h3,
+    h4 {
+        font-size: 1.1rem;
+    }
+
+    h5 {
+        font-size: 1rem;
+    }
+
+    .dashboard-card {
+        min-height: 92px;
+    }
+
+    .dashboard-card .card-body {
+        padding: 13px;
     }
 
     .dashboard-icon {
-        width: 48px;
-        height: 48px;
-        font-size: 21px;
+        width: 44px;
+        height: 44px;
+        margin-right: 11px;
+        font-size: 19px;
+    }
+
+    .dashboard-label {
+        font-size: 12px;
     }
 
     .dashboard-number {
-        font-size: 26px;
+        font-size: 24px;
+    }
+
+    .chart-container {
+        height: 225px;
+        min-height: 225px;
+        max-height: 225px;
+    }
+
+    .card-header {
+        padding: 12px 14px;
+    }
+
+    .card-body {
+        padding: 14px;
+    }
+
+    .form-control,
+    .form-select {
+        min-height: 42px;
+    }
+
+    .table th,
+    .table td {
+        padding: 8px;
+        font-size: 13px;
+    }
+
+    .profile-container {
+        width: calc(100% - 16px);
+        padding-top: 18px;
+        padding-bottom: 18px;
+    }
+
+    .profile-card .card-body {
+        padding: 15px;
+    }
+
+    footer {
+        margin-top: 25px;
+        padding: 15px 10px;
+        font-size: 13px;
+    }
+}
+
+
+/* ==========================
+   Very Small Phones
+========================== */
+
+@media (max-width: 400px) {
+
+    .main-container {
+        padding: 10px;
+    }
+
+    .navbar-brand {
+        max-width: 70%;
+        font-size: 13px;
+    }
+
+    .dashboard-card .card-body {
+        padding: 11px;
+    }
+
+    .dashboard-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 17px;
+    }
+
+    .dashboard-number {
+        font-size: 21px;
+    }
+
+    .chart-container {
+        height: 200px;
+        min-height: 200px;
+        max-height: 200px;
+    }
+
+    .profile-card .card-body {
+        padding: 12px;
+    }
+
+    .table th,
+    .table td {
+        font-size: 12px;
     }
 }
