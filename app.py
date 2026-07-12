@@ -180,6 +180,51 @@ def total_students(user_id):
     return total
 
 
+def get_branch_statistics(user_id):
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute(
+        """
+        SELECT branch, COUNT(*) AS total
+        FROM students
+        WHERE user_id = %s
+        GROUP BY branch
+        ORDER BY total DESC
+        """,
+        (user_id,)
+    )
+
+    branch_data = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    return branch_data
+
+
+def count_branch_students(user_id, branch):
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute(
+        """
+        SELECT COUNT(*) AS total
+        FROM students
+        WHERE user_id = %s
+        AND LOWER(branch) = LOWER(%s)
+        """,
+        (user_id, branch)
+    )
+
+    result = cur.fetchone()
+
+    cur.close()
+    conn.close()
+
+    return result["total"]
+
+
 def roll_exists(roll, user_id):
     conn = get_connection()
     cur = conn.cursor()
@@ -302,23 +347,39 @@ def login():
 @app.route("/", methods=["GET", "POST"])
 def home():
 
-    if "user" not in session:
+    if "user_id" not in session:
         return redirect("/login")
 
+    user_id = session["user_id"]
+
     if request.method == "POST":
-        name = request.form["name"]
-        roll = request.form["roll"]
-        branch = request.form["branch"]
+        name = request.form["name"].strip()
+        roll = request.form["roll"].strip()
+        branch = request.form["branch"].strip().upper()
 
-        if roll_exists(roll, session["user_id"]):
+        if roll_exists(roll, user_id):
 
-            students = get_students(session["user_id"])
-            total = total_students(session["user_id"])
+            students = get_students(user_id)
+            total = total_students(user_id)
+            branch_data = get_branch_statistics(user_id)
+
+            branch_labels = [
+                row["branch"] for row in branch_data
+            ]
+
+            branch_counts = [
+                row["total"] for row in branch_data
+            ]
 
             return render_template(
                 "index.html",
                 students=students,
                 total=total,
+                total_branches=len(branch_data),
+                ece_total=count_branch_students(user_id, "ECE"),
+                cse_total=count_branch_students(user_id, "CSE"),
+                branch_labels=branch_labels,
+                branch_counts=branch_counts,
                 error="Roll number already exists"
             )
 
@@ -326,24 +387,44 @@ def home():
             name,
             roll,
             branch,
-            session["user_id"]
+            user_id
         )
 
         return redirect("/")
 
-    search = request.args.get("search")
+    search = request.args.get("search", "").strip()
 
     if search:
-        students = search_students(search, session["user_id"])
+        students = search_students(search, user_id)
     else:
-        students = get_students(session["user_id"])
+        students = get_students(user_id)
 
-    total = total_students(session["user_id"])
+    total = total_students(user_id)
+
+    branch_data = get_branch_statistics(user_id)
+
+    branch_labels = [
+        row["branch"] for row in branch_data
+    ]
+
+    branch_counts = [
+        row["total"] for row in branch_data
+    ]
+
+    total_branches = len(branch_data)
+
+    ece_total = count_branch_students(user_id, "ECE")
+    cse_total = count_branch_students(user_id, "CSE")
 
     return render_template(
         "index.html",
         students=students,
-        total=total
+        total=total,
+        total_branches=total_branches,
+        ece_total=ece_total,
+        cse_total=cse_total,
+        branch_labels=branch_labels,
+        branch_counts=branch_counts
     )
 
 

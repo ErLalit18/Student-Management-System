@@ -139,3 +139,76 @@ footer{
     }
 
 }
+
+.dashboard-card {
+    border: 0;
+    border-radius: 16px;
+    color: white;
+    overflow: hidden;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.10);
+    transition: transform 0.2s ease;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-4px);
+}
+
+.total-card {
+    background: linear-gradient(135deg, #0d6efd, #084298);
+}
+
+.branch-card {
+    background: linear-gradient(135deg, #6f42c1, #432874);
+}
+
+.ece-card {
+    background: linear-gradient(135deg, #198754, #0f5132);
+}
+
+.cse-card {
+    background: linear-gradient(135deg, #fd7e14, #a94b00);
+}
+
+.dashboard-icon {
+    width: 55px;
+    height: 55px;
+    margin-right: 15px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 25px;
+}
+
+.dashboard-label {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 14px;
+}
+
+.dashboard-number {
+    margin: 2px 0 0;
+    font-weight: 700;
+}
+
+.chart-container {
+    position: relative;
+    min-height: 320px;
+}
+
+@media (max-width: 576px) {
+    .chart-container {
+        min-height: 260px;
+    }
+
+    .dashboard-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 21px;
+    }
+
+    .dashboard-number {
+        font-size: 26px;
+    }
+}
